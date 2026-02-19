@@ -111,6 +111,14 @@ private Transform handTransform;
 
 private Vector3 camForward ;
 private Vector3 camRight ;
+    // 获取当前有效的移动输入：优先使用 DynamicMoveJoystick（手机触摸），否则用 OnMove（固定摇杆/键盘）
+    Vector2 GetMoveInput()
+    {
+        if (DynamicMoveJoystick.IsActive)
+            return DynamicMoveJoystick.Output;
+        return moveInput;
+    }
+
     void HandleMovement()
     {
         // 1. 地面检测
@@ -123,10 +131,12 @@ private Vector3 camRight ;
             velocity.y = -2f;
         }
 
-        controller.Move(toMove * moveSpeed * Time.deltaTime);
+        Vector2 currentMoveInput = GetMoveInput();
+        toMove.x = currentMoveInput.x;
+        toMove.z = currentMoveInput.y;
         camForward = camTransform.forward;
         camRight = camTransform.right;
-        moveDirection=(camForward*moveInput.y)+(camRight*moveInput.x);
+        moveDirection=(camForward*currentMoveInput.y)+(camRight*currentMoveInput.x);
         controller.Move(moveDirection * moveSpeed * Time.deltaTime);
         // 4. 跳跃逻辑
         // 使用公式: v = sqrt(h * -2 * g)
