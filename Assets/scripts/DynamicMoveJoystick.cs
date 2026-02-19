@@ -163,10 +163,14 @@ public class DynamicMoveJoystick : MonoBehaviour
 
     void SetJoystickPosition(Vector2 screenPos)
     {
-        if (canvasRect == null || joystickRoot == null) return;
+        if (joystickRoot == null) return;
+
+        // 转换到 joystickRoot 父物体的本地空间，这样 anchoredPosition 才能正确对应触摸点
+        RectTransform parentRect = joystickRoot.parent as RectTransform;
+        if (parentRect == null) return;
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            canvasRect, screenPos, parentCanvas?.worldCamera, out Vector2 localPos);
+            parentRect, screenPos, parentCanvas?.worldCamera, out Vector2 localPos);
         joystickRoot.anchoredPosition = localPos;
     }
 
